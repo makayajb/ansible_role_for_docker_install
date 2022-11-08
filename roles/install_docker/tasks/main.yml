@@ -1,0 +1,80 @@
+---
+- name: Ping servers
+  ping:
+  
+- name: Uninstall older versions packages for CentOS
+  yum:
+    name: "{{item}}"
+    state: absent
+  loop: "{{centos_docker_packs_to_uninstall}}"
+  when: ansible_os_family == "RedHat"
+
+- name: Install yum-utils package for CentOS
+  yum: 
+      name: yum-utils
+      state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Enable xtras repo
+  ini_file:
+    dest: /etc/yum.repos.d/extras.repo
+    section: extras
+    option: enabled
+    value: "1"
+  when: ansible_os_family == "RedHat" 
+ 
+- name: Add docker repo
+  shell: "yum-config-manager --add-repo  https://download.docker.com/linux/centos/docker-ce.repo"
+  when: ansible_os_family == "RedHat"
+
+- name: Install Docker Engine for Centos
+  yum: 
+    name: "{{item}}"
+    state: present
+    update_cache: True
+  loop: "{{docker_packs_to_install}}"
+  when: ansible_os_family == "RedHat"  
+ 
+- name: Uninstall packages for older versions for Ubuntu
+  apt: 
+    name: "{{item}}"
+    state: absent
+  loop: "{{ ubuntu_docker_packs_to_uninstall }}"
+  when: ansible_os_family == "Debian"
+ 
+- name: Update apt package index and install packages to allow apt to use a repository over HTTPS
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: True
+  loop: "{{ ubuntu_docker_packs_prerequisites }}"
+  when: ansible_os_family == "Debian" 
+
+- name: Add GPG key for docker repo in Ubuntu
+  apt_key: 
+    url: "{{ubuntu_docker_repo_gpg_key_link}}"
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Add Docker repository to apt
+  apt_repository:
+    repo: deb "{{ docker_ubuntu_repo_link }}" "{{ansible_distribution_release}}" stable
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Docker Engine for Ubuntu
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: True
+  loop: "{{ docker_packs_to_install }}"
+  when: ansible_os_family == "Debian"
+
+- name: Add our user to docker group by usermod command
+  user:
+    name: "{{ansible_user}}"
+    groups: docker
+    append: yes
+
+- name: Enable docker service
+  service: name=docker state=started enabled=yes

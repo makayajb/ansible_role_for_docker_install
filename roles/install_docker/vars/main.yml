@@ -1,0 +1,28 @@
+---
+centos_docker_packs_to_uninstall:
+- docker 
+- docker-client
+- docker-client-latest
+- docker-common
+- docker-latest
+- docker-latest-logrotate
+- docker-logrotate
+- docker-engine
+ubuntu_docker_packs_to_uninstall:
+- docker
+- docker-engine 
+- docker.io
+- containerd
+- runc
+ubuntu_docker_packs_prerequisites: 
+- ca-certificates
+- curl
+- gnupg
+- lsb-release
+ubuntu_docker_repo_gpg_key_link: https://download.docker.com/linux/ubuntu/gpg
+docker_ubuntu_repo_link: https://download.docker.com/linux/ubuntu
+docker_packs_to_install:
+- docker-ce
+- docker-ce-cli
+- containerd.io
+- docker-compose-plugin

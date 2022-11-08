@@ -1,0 +1,7 @@
+---
+- name: Install docker to CentOS and Ubuntu servers
+  hosts: all
+  become: yes
+
+  roles:
+    - install_docker

@@ -1,0 +1,3 @@
+[servers]
+ubuntu ansible_host=<IPmask1>
+centos2 ansible_host=<IPmask2>
